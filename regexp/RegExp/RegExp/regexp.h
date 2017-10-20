@@ -19,7 +19,7 @@ typedef enum SymbolType_enum {
 /*##############################################*/
 /*状态*/
 typedef struct Statetag {
-    struct StateCollectiontag *destStateCollection;	/*目标状态集合*/
+    struct StateCollectiontag *destStateCollection;    /*目标a状态集合*/
     struct Statetag *next;
 }State, *pState;
 /*相关操作函数声明*/
@@ -32,9 +32,9 @@ pState cloneState(pState s);
 /*##############################################*/
 /*状态集合的元素*/
 typedef struct StateCollectionEletag {
-	int eleindex;  /*元素*/
-	pState destState;  /*目标状态*/
-	struct StateCollectionEletag *next;
+    int eleindex;  /*元素*/
+    pState destState;  /*目标状态*/
+    struct StateCollectionEletag *next;
 }StateCollectionEle, *pStateCollectionEle;
 /*相关操作函数声明*/
 pStateCollectionEle newStateCollectionEle(int eleindex, pState destS);
@@ -45,10 +45,10 @@ pStateCollectionEle cloneStateCollectionEle(pStateCollectionEle pSCEle);
 /*状态集合*/
 typedef struct StateCollectiontag {
     int destStateCount;   /*目标状态数组的大小*/
-	pStateCollectionEle head;  /*目标状态链表指针*/
+    pStateCollectionEle head;  /*目标状态链表指针*/
 }StateCollection, *pStateCollection;
 /*相关操作函数声明*/
-pStateCollection newStateCollection();	/*新建状态集合*/
+pStateCollection newStateCollection();    /*新建状态集合*/
 void destroyStateCollection(pStateCollection pSC);
 pStateCollectionEle appendStateCollection(pStateCollection pSC, pStateCollectionEle pSCEle);
 pStateCollection cloneStateCollection(pStateCollection pSC);
@@ -78,8 +78,8 @@ typedef struct Machinetag {
 }Machine, *pMachine;
 /*相关操作函数声明*/
 pMachine newMachine(pState start, pState end,
-                        int pos_start, int pos_end,
-                        char join_mode, char not_mode);
+                    int pos_start, int pos_end,
+                    char join_mode, char not_mode);
 void destroyMachine(pMachine mac);
 
 /*##############################################*/
@@ -220,50 +220,50 @@ pStateCollection cloneStateCollection(pStateCollection pSC) {
 /*##############################################*/
 /*状态表格*/
 pStateTable newStateTable(int eleCount) {
-	pStateTable pst = NULL;
-	pst = (pStateTable)malloc(sizeof(StateTable));
-	if (pst != NULL) {
-		pst->eleCount = eleCount;
-		pst->stateCount = 0;
-		pst->head = NULL;
-		pst->curState = NULL;
-		pst->tail = NULL;
-	}
-	return pst;
+    pStateTable pst = NULL;
+    pst = (pStateTable)malloc(sizeof(StateTable));
+    if (pst != NULL) {
+        pst->eleCount = eleCount;
+        pst->stateCount = 0;
+        pst->head = NULL;
+        pst->curState = NULL;
+        pst->tail = NULL;
+    }
+    return pst;
 }
 
 void destroyStateTable(pStateTable st) {
-	pState phead = NULL;
-	while (st->head != NULL) {
-		phead = st->head;
-		st->head = st->head->next;
-		destroyState(phead);
-	}
-	free(st);
+    pState phead = NULL;
+    while (st->head != NULL) {
+        phead = st->head;
+        st->head = st->head->next;
+        destroyState(phead);
+    }
+    free(st);
 }
 
 pState appendStateTable(pStateTable st, pState s) {
-	if (s != NULL && st != NULL) {
+    if (s != NULL && st != NULL) {
         if (st->tail == NULL) {
             st->tail = s;
         } else {
             st->tail->next = s;
             st->tail = s;
         }
-		st->stateCount++;
-		
-		if (st->head == NULL) {
-		  st->head = st->tail;   /*只有一个元素*/
+        st->stateCount++;
+        
+        if (st->head == NULL) {
+            st->head = st->tail;   /*只有一个元素*/
         }
-	}
-	return s;
+    }
+    return s;
 }
 
 /*输出StateTable,测试用*/
 void showStateTable(pStateTable pst) {
     pState tmp;
     pStateCollectionEle pscele;
-
+    
     printf("debug: ################### there is the NFA table basic info: #######################\n");
     printf("debug: StateCount = %d\n", pst->stateCount);
     printf("head->%x\tcur->%x\ttail->%x\n", pst->head, pst->curState, pst->tail);
@@ -305,7 +305,7 @@ pStateTable cloneSubStateTable(pStateTable pst, pState ps_start, pState ps_end) 
                 ps = ps->next;  /*移动到原状态表的下一个状态*/
             }
             /*start -- end这一段状态链表克隆完毕
-            下面将做目标状态的替换*/
+             下面将做目标状态的替换*/
             psnew = pstnew->head;
             /*遍历新的状态表*/
             while (psnew != NULL) {
@@ -316,13 +316,13 @@ pStateTable cloneSubStateTable(pStateTable pst, pState ps_start, pState ps_end) 
                     psenew = pse->destState->destStateCollection->head;
                     /*用原目标状态的克隆体来替换*/
                     pse->destState = psenew->destState;
-
+                    
                     pse = pse->next; /*下一个状态*/
                 }
                 psnew = psnew->next;
             }
             /*新状态表中的目标状态集合已经替换完毕,
-            下面删除这个克隆体在原状态目标集合中的临时元素*/
+             下面删除这个克隆体在原状态目标集合中的临时元素*/
             ps = ps_start;
             while (ps != NULL) {
                 psenew = ps->destStateCollection->head; /*克隆体状态集合元素指针*/
@@ -337,13 +337,13 @@ pStateTable cloneSubStateTable(pStateTable pst, pState ps_start, pState ps_end) 
         }
     }
     /*
-    printf("debug: ######## start: %x | end: %x\n", ps_start, ps_end);  /*###  debug:  ####*/
+     printf("debug: ######## start: %x | end: %x\n", ps_start, ps_end);  /*###  debug:  ####*/
     return pstnew;
 }
 
 pStateTable joinStateTable(pStateTable pst, pStateTable psttmp) {
     if (pst == NULL) {
-        pst = newStateTable(psttmp);
+        pst = newStateTable(psttmp->eleCount);
         pst->head = psttmp->head;
         pst->tail = psttmp->tail;
         pst->curState = pst->tail;
@@ -369,59 +369,61 @@ pStateTable joinStateTable(pStateTable pst, pStateTable psttmp) {
 /*##############################################*/
 /*状态机*/
 pMachine newMachine(pState start, pState end,
-                        int pos_start, int pos_end,
-                        char join_mode, char not_mode) {
-	pMachine pm = NULL;
-	pm = (pMachine)malloc(sizeof(Machine));
-	if (pm != NULL) {
-		pm->state_start = start;
-		pm->state_end = end;
-		pm->pos_start = pos_start;
-		pm->pos_end = pos_end;
-		pm->join_mode = join_mode;
-		pm->not_mode = not_mode;
-	}
-	return pm;
+                    int pos_start, int pos_end,
+                    char join_mode, char not_mode) {
+    pMachine pm = NULL;
+    pm = (pMachine)malloc(sizeof(Machine));
+    if (pm != NULL) {
+        pm->state_start = start;
+        pm->state_end = end;
+        pm->pos_start = pos_start;
+        pm->pos_end = pos_end;
+        pm->join_mode = join_mode;
+        pm->not_mode = not_mode;
+    }
+    return pm;
 }
 
 void destroyMachine(pMachine mac) {
-	free(mac);
+    free(mac);
 }
 
 /*##############################################*/
 /*状态机堆栈*/
 pMachineStack newMachineStack() {
-	pMachineStack pms = NULL;
-	pms = (pMachineStack)malloc(sizeof(MachineStack));
-	if (pms != NULL) {
-		pms->topM = NULL;
-		pms->MachineCount = 0;
-	}
-	return pms;
+    pMachineStack pms = NULL;
+    pms = (pMachineStack)malloc(sizeof(MachineStack));
+    if (pms != NULL) {
+        pms->topM = NULL;
+        pms->MachineCount = 0;
+    }
+    return pms;
 }
 
 void destroyMachineStack(pMachineStack pms) {
-	pMachine pm = NULL;
-	while (pms->topM != NULL) {
-		pm = popMachine(pms);
-		destroyMachine(pm);
-	}
-	free(pms);
+    pMachine pm = NULL;
+    while (pms->topM != NULL) {
+        pm = popMachine(pms);
+        destroyMachine(pm);
+    }
+    free(pms);
 }
 
 pMachine pushMachine(pMachineStack pms, pMachine pMEle) {
-	pMEle->next = pms->topM;
-	pms->topM = pMEle;
-	pms->MachineCount++;
+    pMEle->next = pms->topM;
+    pms->topM = pMEle;
+    pms->MachineCount++;
+    return pMEle;
 }
 
 pMachine popMachine(pMachineStack pms) {
-	pMachine pMEle = NULL;
-	if (pms->MachineCount > 0) {
-		pMEle = pms->topM;
-		pms->topM = pms->topM->next;
-		pms->MachineCount--;
-	}
-	return pMEle;
+    pMachine pMEle = NULL;
+    if (pms->MachineCount > 0) {
+        pMEle = pms->topM;
+        pms->topM = pms->topM->next;
+        pms->MachineCount--;
+    }
+    return pMEle;
 }
-	
+
+
